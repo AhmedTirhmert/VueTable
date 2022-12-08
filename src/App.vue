@@ -1,11 +1,12 @@
 <!-- @format -->
 
 <script setup>
-  import dataTable from './components/table.vue';
 </script>
 
 <template>
-  <data-table />
+  <section class="container">
+    <router-view></router-view>
+  </section>
 </template>
 
 <style scoped></style>
