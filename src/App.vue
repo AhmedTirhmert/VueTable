@@ -1,11 +1,23 @@
 <!-- @format -->
 
 <script setup>
+  import dataTable from './components/table.vue';
+  import userProfile from './components/profile.vue';
+  import { reactive } from 'vue';
+
+  const emit = defineEmits(['showProfileModal']);
+  const user = reactive({
+    infos: null,
+  });
+  const showProfileModal = (userInfos) => {
+    user.infos = userInfos;
+  };
 </script>
 
 <template>
   <section class="container">
-    <router-view></router-view>
+    <data-table @showProfileModal="showProfileModal"></data-table>
+    <user-profile :user="user.infos" />
   </section>
 </template>
 

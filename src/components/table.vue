@@ -4,9 +4,10 @@
   import { reactive } from '@vue/reactivity';
   import { computed, onMounted, watch } from '@vue/runtime-core';
   import axios from 'axios';
-  import { useRoute } from 'vue-router';
 
+  defineEmits(['showProfileModal']);
   defineProps({});
+
   // Data
   const pagination = reactive({
     startIndex: 0,
@@ -24,12 +25,9 @@
     displayData: [],
   });
 
-  const route = useRoute();
-
   // Life Cycle Hooks
   onMounted(() => {
     loadData();
-    console.log(route);
   });
 
   // Methodes
@@ -74,7 +72,6 @@
   };
   const searchData = (searchQuery) => {
     entries.displayData = entries.data.filter((elem) => {
-      console.log(Object.values(elem).join(''));
       return Object.values(elem)
         .join('')
         .toLowerCase()
@@ -128,7 +125,11 @@
         <th>BALANCE</th>
       </thead>
       <tbody>
-        <tr v-for="(row, index) in entries.displayData" :key="index">
+        <tr
+          v-for="(row, index) in entries.displayData"
+          :key="index"
+          @click.stop="$emit('showProfileModal', row)"
+        >
           <td>{{ row.first }}</td>
           <td>{{ row.last }}</td>
           <td>{{ row.address }}</td>
@@ -146,7 +147,7 @@
         {{ pagination.stopIndex + 1 }} from {{ entriesCount }}</span
       >
     </div>
-    <div class="pagination">
+    <div class="pagination" v-show="!search.searchQuery.length">
       <button class="prev" @click="prevPage()">
         <svg
           width="6"
