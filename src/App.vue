@@ -1,17 +1,17 @@
 <!-- @format -->
 
 <script setup>
-  import dataTable from './components/table.vue';
-  import userProfile from './components/profile.vue';
-  import { reactive } from 'vue';
+import dataTable from "./components/table/table.vue";
+import userProfile from "./components/profile/profile.vue";
+import { reactive } from "vue";
 
-  const emit = defineEmits(['showProfileModal']);
-  const user = reactive({
-    infos: null,
-  });
-  const showProfileModal = (userInfos) => {
-    user.infos = userInfos;
-  };
+const emit = defineEmits(["showProfileModal"]);
+const user = reactive({
+  infos: null,
+});
+const showProfileModal = (userInfos) => {
+  user.infos = userInfos;
+};
 </script>
 
 <template>

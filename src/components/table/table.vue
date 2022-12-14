@@ -1,101 +1,126 @@
 <!-- @format -->
 
 <script setup lang="ts">
-  import { reactive } from '@vue/reactivity';
-  import { computed, onMounted, watch } from '@vue/runtime-core';
-  import axios from 'axios';
+import { reactive } from "@vue/reactivity";
+import { computed, onMounted, watch } from "@vue/runtime-core";
+import axios from "axios";
 
-  defineEmits(['showProfileModal']);
-  defineProps({});
+defineEmits(["showProfileModal"]);
+//Interfaces
+interface Entry {
+  first: string;
+  last: string;
+  email: string;
+  address: string;
+  created: string;
+  balance: string;
+}
+interface Pagination {
+  startIndex: number;
+  stopIndex: number;
+  numberOfPages: number;
+  listedEntriesCount: number;
+  page: number;
+}
+interface Search {
+  searchQuery: string;
+  searchResaults: Array<Entry>;
+}
+interface Entries {
+  data: Array<Entry>;
+  displayData: Array<Entry>;
+}
 
-  // Data
-  const pagination = reactive({
-    startIndex: 0,
-    stopIndex: 9,
-    numberOfPages: 0,
-    listedEntriesCount: 10,
-    page: 1,
-  });
-  const search = reactive({
-    searchQuery: '',
-    searchResaults: [],
-  });
-  const entries = reactive({
-    data: [],
-    displayData: [],
-  });
+// Data
+const pagination: Pagination = reactive({
+  startIndex: 0,
+  stopIndex: 0,
+  numberOfPages: 0,
+  listedEntriesCount: 10,
+  page: 1,
+});
+const search: Search = reactive({
+  searchQuery: "",
+  searchResaults: [],
+});
+const entries: Entries = reactive({
+  data: [],
+  displayData: [],
+});
 
-  // Life Cycle Hooks
-  onMounted(() => {
-    loadData();
-  });
+// Life Cycle Hooks
+onMounted(() => {
+  loadData();
+});
 
-  // Methodes
-  const loadData = async () => {
-    let { data } = await axios.get(
-      `https://randomapi.com/api/6de6abfedb24f889e0b5f675edc50deb`
-    );
-    entries.data = data.results[0];
-    showNEntries();
-    calcNumberOfPages();
-  };
-  const calcNumberOfPages = () => {
-    pagination.numberOfPages = Math.round(
-      entries.data.length / pagination.listedEntriesCount
-    );
-  };
-  const isCurrentPage = (index) => {
-    return pagination.page == index;
-  };
-  const setlistedEntriesCount = (e) => {
-    pagination.listedEntriesCount = parseInt(e.target.value);
-    showNEntries();
-  };
-  const showNEntries = () => {
-    pagination.stopIndex =
-      pagination.startIndex + pagination.listedEntriesCount - 1;
-    entries.displayData = entries.data.filter((elem, index) => {
-      return index >= pagination.startIndex && index <= pagination.stopIndex;
-    });
-  };
-  const nextPage = () => {
-    if (pagination.page < pagination.numberOfPages) {
-      pagination.page++;
-      pagination.startIndex += pagination.listedEntriesCount;
-    }
-  };
-  const prevPage = () => {
-    if (pagination.page > 1) {
-      pagination.page--;
-      pagination.startIndex -= pagination.listedEntriesCount;
-    }
-  };
-  const searchData = (searchQuery) => {
-    entries.displayData = entries.data.filter((elem) => {
-      return Object.values(elem)
-        .join('')
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-    });
-  };
-  //Computed
-  const entriesCount = computed(() => {
-    return entries.data.length;
-  });
-  // Watchers
-  watch(
-    () => search.searchQuery,
-    (searchQuery) => {
-      searchQuery.length ? searchData(searchQuery) : showNEntries();
-    }
+// Methodes
+const loadData = async () => {
+  let { data } = await axios.get(
+    `https://randomapi.com/api/6de6abfedb24f889e0b5f675edc50deb`
   );
-  watch(
-    () => pagination.startIndex,
-    (startIndex) => {
-      showNEntries();
-    }
+  entries.data = data.results[0];
+  calcNumberOfPages();
+  showNEntries();
+};
+const calcNumberOfPages = () => {
+  pagination.numberOfPages = Math.round(
+    entries.data.length / pagination.listedEntriesCount
   );
-  watch(() => pagination.listedEntriesCount, calcNumberOfPages);
+};
+const isCurrentPage = (index: number) => {
+  return pagination.page == index;
+};
+const setlistedEntriesCount = (e: Event) => {
+  pagination.listedEntriesCount = parseInt(
+    (e.target as HTMLSelectElement).value
+  );
+  showNEntries();
+};
+const showNEntries = () => {
+  pagination.stopIndex =
+    pagination.startIndex + pagination.listedEntriesCount - 1;
+  entries.displayData = entries.data.filter((elem, index) => {
+    return index >= pagination.startIndex && index <= pagination.stopIndex;
+  });
+};
+const nextPage = () => {
+  if (pagination.page < pagination.numberOfPages) {
+    pagination.page++;
+    pagination.startIndex += pagination.listedEntriesCount;
+  }
+};
+const prevPage = () => {
+  if (pagination.page > 1) {
+    pagination.page--;
+    pagination.startIndex -= pagination.listedEntriesCount;
+  }
+};
+const searchData = (searchQuery: string) => {
+  entries.displayData = entries.data.filter((elem: Entry) => {
+    return Object.values(elem)
+      .join("")
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+  });
+};
+//Computed
+const entriesCount = computed<number>(() => {
+  return entries.data.length;
+});
+// Watchers
+watch(
+  () => search.searchQuery,
+  (searchQuery) => {
+    searchQuery.length ? searchData(searchQuery) : showNEntries();
+  }
+);
+watch(
+  () => pagination.startIndex,
+  (startIndex) => {
+    showNEntries();
+  }
+);
+watch(() => pagination.listedEntriesCount, calcNumberOfPages);
 </script>
 
 <template>

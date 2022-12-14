@@ -1,25 +1,44 @@
 <!-- @format -->
 
 <script setup lang="ts">
-  import { reactive, watch } from 'vue';
-  import { ref } from 'vue';
-  const props = defineProps({
-    user: null,
-  });
-  const modal = ref('modal');
-  const user = reactive({
-    infos: {},
-  });
-  const hideModal = () => {
-    modal.value.classList.toggle('hidden');
-  };
-  watch(
-    () => props.user,
-    (value) => {
-      modal.value.classList.toggle('hidden');
-      user.infos = value;
-    }
-  );
+import { onMounted, reactive, watch } from "vue";
+import { ref } from "vue";
+
+//Interfaces
+interface User {
+  first: string;
+  last: string;
+  email: string;
+  address: string;
+  created: string;
+  balance: string;
+}
+interface Props {
+  user: User | null;
+}
+
+const props = defineProps<Props>();
+
+const modal = ref<HTMLElement | null>("modal");
+let user: User = reactive({
+  first: "",
+  last: "",
+  email: "",
+  address: "",
+  created: "",
+  balance: "",
+});
+const hideModal = () => {
+  modal.value.classList.toggle("hidden");
+};
+// onMounted(()=>{console.log(props);})
+watch(
+  () => props.user,
+  (value) => {
+    modal.value.classList.toggle("hidden");
+    user = value;
+  }
+);
 </script>
 
 <template>
@@ -32,27 +51,27 @@
       <div class="modal-body">
         <div class="user-info-group">
           <span class="label">First Name <span>:</span></span>
-          <span class="user-info">{{ user.infos.first }}</span>
+          <span class="user-info">{{ user.first }}</span>
         </div>
         <div class="user-info-group">
           <span class="label">Last Name <span>:</span></span>
-          <span class="user-info">{{ user.infos.last }}</span>
+          <span class="user-info">{{ user.last }}</span>
         </div>
         <div class="user-info-group">
           <span class="label">Email <span>:</span></span>
-          <span class="user-info">{{ user.infos.email }}</span>
+          <span class="user-info">{{ user.email }}</span>
         </div>
         <div class="user-info-group">
           <span class="label">Address <span>:</span></span>
-          <span class="user-info">{{ user.infos.address }}</span>
+          <span class="user-info">{{ user.address }}</span>
         </div>
         <div class="user-info-group">
           <span class="label">Balance <span>:</span></span>
-          <span class="user-info">{{ user.infos.balance }}</span>
+          <span class="user-info">{{ user.balance }}</span>
         </div>
         <div class="user-info-group">
           <span class="label">Created <span>:</span></span>
-          <span class="user-info">{{ user.infos.created }}</span>
+          <span class="user-info">{{ user.created }}</span>
         </div>
       </div>
     </div>
