@@ -4,8 +4,11 @@
 import { reactive } from "@vue/reactivity";
 import { computed, onMounted, watch } from "@vue/runtime-core";
 import axios from "axios";
+import { useUsersStore } from "@/stores/users";
+import { onBeforeMount } from "vue";
 
 defineEmits(["showProfileModal"]);
+defineProps({});
 //Interfaces
 interface Entry {
   first: string;
@@ -32,6 +35,7 @@ interface Entries {
 }
 
 // Data
+const usersStore = useUsersStore();
 const pagination: Pagination = reactive({
   startIndex: 0,
   stopIndex: 0,
@@ -54,14 +58,12 @@ onMounted(() => {
 });
 
 // Methodes
-const loadData = async () => {
-  let { data } = await axios.get(
-    `https://randomapi.com/api/6de6abfedb24f889e0b5f675edc50deb`
-  );
-  entries.data = data.results[0];
+const loadData = () => {
+  entries.data = usersStore.getUsers;
   calcNumberOfPages();
   showNEntries();
 };
+
 const calcNumberOfPages = () => {
   pagination.numberOfPages = Math.round(
     entries.data.length / pagination.listedEntriesCount
@@ -108,6 +110,12 @@ const entriesCount = computed<number>(() => {
   return entries.data.length;
 });
 // Watchers
+watch(
+  () => usersStore.getUsers,
+  () => {
+    // loadData();
+  }
+);
 watch(
   () => search.searchQuery,
   (searchQuery) => {

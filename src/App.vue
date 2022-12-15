@@ -3,13 +3,20 @@
 <script setup>
 import dataTable from "./components/table/table.vue";
 import userProfile from "./components/profile/profile.vue";
-import { reactive } from "vue";
+
+import { useUsersStore } from "@/stores/users";
+import { reactive, onBeforeMount } from "vue";
 
 const emit = defineEmits(["showProfileModal"]);
 const user = reactive({
   infos: null,
 });
-const showProfileModal = (userInfos) => {
+const usersStore = useUsersStore();
+
+onBeforeMount(async () => {
+  await usersStore.loadUsersFromAPI();
+});
+function showProfileModal(userInfos) {
   user.infos = userInfos;
 };
 </script>
