@@ -13,7 +13,7 @@
       margin-right: 0.5em;
     }
     & select {
-      font-family: 'Montserrat';
+      font-family: "Montserrat";
       color: #b9b9c3;
       padding: 7px 13px;
       border: 1px solid #d8d6de;
@@ -26,7 +26,7 @@
       margin-right: 0.5em;
     }
     & input {
-      font-family: 'Montserrat';
+      font-family: "Montserrat";
       color: #b9b9c3;
       padding: 7px 13px;
       border: 1px solid #d8d6de;
@@ -125,6 +125,10 @@
       border: none;
       outline: none;
       cursor: pointer;
+      &:disabled {
+        cursor: not-allowed;
+        background: #d2d2d2;
+      }
     }
   }
 }

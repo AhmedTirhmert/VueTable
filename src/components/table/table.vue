@@ -1,72 +1,44 @@
 <!-- @format -->
 
 <script setup lang="ts">
-import { reactive } from "@vue/reactivity";
-import { computed, onMounted, watch } from "@vue/runtime-core";
-import axios from "axios";
+import { onBeforeMount, computed, onMounted, watch, reactive } from "vue";
 import { useUsersStore } from "@/stores/users";
-import { onBeforeMount } from "vue";
 
 defineEmits(["showProfileModal"]);
 defineProps({});
 //Interfaces
-interface Entry {
-  first: string;
-  last: string;
-  email: string;
-  address: string;
-  created: string;
-  balance: string;
-}
 interface Pagination {
-  startIndex: number;
-  stopIndex: number;
   numberOfPages: number;
   listedEntriesCount: number;
   page: number;
 }
 interface Search {
   searchQuery: string;
-  searchResaults: Array<Entry>;
-}
-interface Entries {
-  data: Array<Entry>;
-  displayData: Array<Entry>;
 }
 
 // Data
 const usersStore = useUsersStore();
 const pagination: Pagination = reactive({
-  startIndex: 0,
-  stopIndex: 0,
   numberOfPages: 0,
   listedEntriesCount: 10,
   page: 1,
 });
 const search: Search = reactive({
   searchQuery: "",
-  searchResaults: [],
-});
-const entries: Entries = reactive({
-  data: [],
-  displayData: [],
 });
 
 // Life Cycle Hooks
-onMounted(() => {
-  loadData();
+onBeforeMount(async () => {});
+onMounted(async () => {
+  await usersStore.loadUsersFromAPI();
+  calcNumberOfPages();
 });
 
 // Methodes
-const loadData = () => {
-  entries.data = usersStore.getUsers;
-  calcNumberOfPages();
-  showNEntries();
-};
 
 const calcNumberOfPages = () => {
   pagination.numberOfPages = Math.round(
-    entries.data.length / pagination.listedEntriesCount
+    usersStore.getDataLength / pagination.listedEntriesCount
   );
 };
 const isCurrentPage = (index: number) => {
@@ -76,56 +48,34 @@ const setlistedEntriesCount = (e: Event) => {
   pagination.listedEntriesCount = parseInt(
     (e.target as HTMLSelectElement).value
   );
-  showNEntries();
-};
-const showNEntries = () => {
-  pagination.stopIndex =
-    pagination.startIndex + pagination.listedEntriesCount - 1;
-  entries.displayData = entries.data.filter((elem, index) => {
-    return index >= pagination.startIndex && index <= pagination.stopIndex;
-  });
+  usersStore.displayedData(undefined, pagination.listedEntriesCount);
 };
 const nextPage = () => {
-  if (pagination.page < pagination.numberOfPages) {
-    pagination.page++;
-    pagination.startIndex += pagination.listedEntriesCount;
-  }
+  usersStore.nextPage(pagination.listedEntriesCount);
+  pagination.page =
+    pagination.page < pagination.numberOfPages
+      ? pagination.page + 1
+      : pagination.numberOfPages;
 };
 const prevPage = () => {
-  if (pagination.page > 1) {
-    pagination.page--;
-    pagination.startIndex -= pagination.listedEntriesCount;
-  }
-};
-const searchData = (searchQuery: string) => {
-  entries.displayData = entries.data.filter((elem: Entry) => {
-    return Object.values(elem)
-      .join("")
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-  });
+  usersStore.prevPage(pagination.listedEntriesCount);
+  pagination.page = pagination.page > 1 ? pagination.page - 1 : 1;
 };
 //Computed
-const entriesCount = computed<number>(() => {
-  return entries.data.length;
+const isLastPage = computed(() => {
+  return (
+    usersStore.data.indexOf(usersStore.displayData.at(-1)) ==
+    usersStore.getDataLength - 1
+  );
+});
+const isFirstPage = computed(() => {
+  return usersStore.data.indexOf(usersStore.displayData.at(0)) == 0;
 });
 // Watchers
 watch(
-  () => usersStore.getUsers,
-  () => {
-    // loadData();
-  }
-);
-watch(
   () => search.searchQuery,
   (searchQuery) => {
-    searchQuery.length ? searchData(searchQuery) : showNEntries();
-  }
-);
-watch(
-  () => pagination.startIndex,
-  (startIndex) => {
-    showNEntries();
+    usersStore.searchData(searchQuery);
   }
 );
 watch(() => pagination.listedEntriesCount, calcNumberOfPages);
@@ -159,7 +109,7 @@ watch(() => pagination.listedEntriesCount, calcNumberOfPages);
       </thead>
       <tbody>
         <tr
-          v-for="(row, index) in entries.displayData"
+          v-for="(row, index) in usersStore.getDisplayData"
           :key="index"
           @click.stop="$emit('showProfileModal', row)"
         >
@@ -175,13 +125,12 @@ watch(() => pagination.listedEntriesCount, calcNumberOfPages);
   </div>
   <div class="table-footing">
     <div class="info">
-      <span v-show="!search.searchQuery.length"
-        >Showing {{ pagination.startIndex + 1 }} to
-        {{ pagination.stopIndex + 1 }} from {{ entriesCount }}</span
-      >
+      <span v-show="!search.searchQuery.length">{{
+        usersStore.getPaginationString
+      }}</span>
     </div>
     <div class="pagination" v-show="!search.searchQuery.length">
-      <button class="prev" @click="prevPage()">
+      <button class="prev" @click="prevPage()" :disabled="isFirstPage">
         <svg
           width="6"
           height="10"
@@ -203,7 +152,7 @@ watch(() => pagination.listedEntriesCount, calcNumberOfPages);
           >{{ i }}</span
         >
       </div>
-      <button class="next" @click="nextPage()">
+      <button class="next" @click="nextPage()" :disabled="isLastPage">
         <svg
           width="6"
           height="10"

@@ -3,7 +3,6 @@
 <script setup>
 import dataTable from "./components/table/table.vue";
 import userProfile from "./components/profile/profile.vue";
-
 import { useUsersStore } from "@/stores/users";
 import { reactive, onBeforeMount } from "vue";
 
@@ -13,12 +12,10 @@ const user = reactive({
 });
 const usersStore = useUsersStore();
 
-onBeforeMount(async () => {
-  await usersStore.loadUsersFromAPI();
-});
+
 function showProfileModal(userInfos) {
   user.infos = userInfos;
-};
+}
 </script>
 
 <template>
