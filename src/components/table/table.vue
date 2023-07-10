@@ -4,8 +4,6 @@
 import { onBeforeMount, computed, onMounted, watch, reactive } from "vue";
 import { useUsersStore } from "@/stores/users";
 
-defineEmits(["showProfileModal"]);
-defineProps({});
 //Interfaces
 interface Pagination {
   numberOfPages: number;
@@ -15,7 +13,15 @@ interface Pagination {
 interface Search {
   searchQuery: string;
 }
-
+interface Entry {
+  first: string;
+  last: string;
+  email: string;
+  address: string;
+  created: string;
+  balance: string;
+}
+defineEmits(["showProfileModal"]);
 // Data
 const usersStore = useUsersStore();
 const pagination: Pagination = reactive({
@@ -64,12 +70,17 @@ const prevPage = () => {
 //Computed
 const isLastPage = computed(() => {
   return (
-    usersStore.data.indexOf(usersStore.displayData.at(-1)) ==
+    usersStore.data.findIndex((Entry: Entry) =>
+      usersStore.displayData.at(-1)
+    ) ===
     usersStore.getDataLength - 1
   );
 });
 const isFirstPage = computed(() => {
-  return usersStore.data.indexOf(usersStore.displayData.at(0)) == 0;
+  return (
+    usersStore.data.findIndex((Entry: Entry) => usersStore.displayData.at(0)) ==
+    0
+  );
 });
 // Watchers
 watch(

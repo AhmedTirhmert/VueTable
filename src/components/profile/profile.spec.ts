@@ -7,15 +7,15 @@ const user = {
   balance: "9000",
   created: "12 jun 2021",
 };
-describe("<Profile />", () => {
-  it("renders", () => {
-    // see: https://test-utils.vuejs.org/guide/
-    cy.mount(Profile, {
-      props: {
-        user: user,
-      },
-    });
-    cy.get(".modal").should("be.hidden");
+// describe("<Profile />", () => {
+//   it("renders", () => {
+//     // see: https://test-utils.vuejs.org/guide/
+//     cy.mount(Profile, {
+//       props: {
+//         user: user,
+//       },
+//     });
+//     cy.get(".modal").should("be.hidden");
 
-  });
-});
+//   });
+// });

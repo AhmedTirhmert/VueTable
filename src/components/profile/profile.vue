@@ -1,7 +1,7 @@
 <!-- @format -->
 
 <script setup lang="ts">
-import { onMounted, reactive, watch } from "vue";
+import { reactive, watch } from "vue";
 import { ref } from "vue";
 
 //Interfaces
@@ -19,8 +19,8 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const modal = ref<HTMLElement | null>("modal");
-let user: User = reactive({
+const modal = ref<HTMLElement | null>(null);
+let user = ref<User>({
   first: "",
   last: "",
   email: "",
@@ -29,16 +29,16 @@ let user: User = reactive({
   balance: "",
 });
 const hideModal = () => {
-  modal.value.classList.toggle("hidden");
+  modal.value?.classList.toggle("hidden");
 };
 // onMounted(()=>{console.log(props);})
-watch(
-  () => props.user,
-  (value) => {
-    modal.value.classList.toggle("hidden");
-    user = value;
-  }
-);
+// watch(
+//   () => props.user,
+//   (value: User) => {
+//     modal.value?.classList.toggle("hidden");
+//     user.value = value;
+//   }
+// );
 </script>
 
 <template>

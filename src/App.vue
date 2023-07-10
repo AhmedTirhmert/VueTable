@@ -1,27 +1,37 @@
 <!-- @format -->
 
-<script setup>
+<script lang="ts" setup>
 import dataTable from "./components/table/table.vue";
 import userProfile from "./components/profile/profile.vue";
-import { useUsersStore } from "@/stores/users";
-import { reactive, onBeforeMount } from "vue";
+import { ref } from "vue";
 
-const emit = defineEmits(["showProfileModal"]);
-const user = reactive({
-  infos: null,
+interface User {
+  first: string;
+  last: string;
+  email: string;
+  address: string;
+  created: string;
+  balance: string;
+}
+
+const user = ref<User>({
+  address: "",
+  balance: "",
+  created: "",
+  email: "",
+  first: "",
+  last: "",
 });
-const usersStore = useUsersStore();
 
-
-function showProfileModal(userInfos) {
-  user.infos = userInfos;
+function showProfileModal(userInfos: User) {
+  user.value = userInfos;
 }
 </script>
 
 <template>
   <section class="container">
-    <data-table @showProfileModal="showProfileModal"></data-table>
-    <user-profile :user="user.infos" />
+    <dataTable @showProfileModal="showProfileModal" />
+    <userProfile :user="user" />
   </section>
 </template>
 
