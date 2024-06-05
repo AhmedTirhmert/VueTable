@@ -55,6 +55,7 @@ const setlistedEntriesCount = (e: Event) => {
     (e.target as HTMLSelectElement).value
   );
   usersStore.displayedData(undefined, pagination.listedEntriesCount);
+  pagination.page = 1;
 };
 const nextPage = () => {
   usersStore.nextPage(pagination.listedEntriesCount);
@@ -69,18 +70,10 @@ const prevPage = () => {
 };
 //Computed
 const isLastPage = computed(() => {
-  return (
-    usersStore.data.findIndex((Entry: Entry) =>
-      usersStore.displayData.at(-1)
-    ) ===
-    usersStore.getDataLength - 1
-  );
+  return pagination.page === pagination.numberOfPages;
 });
 const isFirstPage = computed(() => {
-  return (
-    usersStore.data.findIndex((Entry: Entry) => usersStore.displayData.at(0)) ==
-    0
-  );
+  return pagination.page === 1;
 });
 // Watchers
 watch(
